@@ -41,6 +41,7 @@ namespace TST.Vision.Thirdparty
         List<Mat> m_cvObjectList = new List<Mat>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
         PictureBox picBox = new PictureBox();
+        private double m_CurrentZoomRate = 0;
         public EmguCVControlEx()
         {
             InitializeComponent();
@@ -53,6 +54,7 @@ namespace TST.Vision.Thirdparty
             this.picBox.Name = "cvPictureBox";
             this.picBox.Size = new System.Drawing.Size(437, 477);
             this.picBox.TabIndex = 0;
+            this.picBox.Location = this.Location;
             this.Controls.Add(this.picBox);
         }
 
@@ -85,11 +87,22 @@ namespace TST.Vision.Thirdparty
 
         private void ResetDisplayImag(Mat TempCvImage)
         {
-            if (TempCvImage != null)
+            if (TempCvImage == null)
             {
-                Image<Bgr, Byte> img = TempCvImage.ToImage<Bgr, Byte>();
-                picBox.Image = img.Resize(400, 400, Inter.Nearest).ToBitmap();
+                return;
             }
+            Image<Bgr, Byte> img = TempCvImage.ToImage<Bgr, Byte>();
+            /*
+            double TempZoomW = (this.Width * 1.0) / img.Size.Width;
+            double TempZoomH = (this.Height * 1.0) / img.Size.Height;
+            m_CurrentZoomRate = Math.Min(TempZoomH, TempZoomW);
+            m_CurrentZoomRate = Math.Min(m_CurrentZoomRate, 1.0);
+            int displayWith = (int)Math.Round(m_CurrentZoomRate * img.Size.Width);
+            int displayHeight = (int)Math.Round(m_CurrentZoomRate * img.Size.Height);
+            picBox.Image = img.Resize(displayWith, displayHeight, Inter.Nearest).ToBitmap();
+             * */
+            picBox.SizeMode = PictureBoxSizeMode.Zoom;
+            picBox.Image = img.ToBitmap();
         }
 
         public void ShowMessage(int x, int y, string message, System.Drawing.Color color)

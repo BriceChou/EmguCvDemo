@@ -12,3 +12,5 @@ C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\obj\Debug\TST.Vision.Thirdparty
 C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\obj\Debug\TST.Vision.Thirdparty.csprojResolveAssemblyReference.cache
 C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\bin\Debug\TST.Base.ToolsInterface.dll
 C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\bin\Debug\TST.Base.ToolsInterface.pdb
+C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\obj\Debug\TST.Vision.Thirdparty.EmguCVControlEx.resources
+C:\local\TST\TSTEmguCVDemo\TST.Vision.Thirdparty\obj\Debug\TST.Vision.Thirdparty.csproj.GenerateResource.Cache
