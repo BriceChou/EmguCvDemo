@@ -1,0 +1,14 @@
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TSTEmguCVDemo.exe.config
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TSTEmguCVDemo.exe
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TSTEmguCVDemo.pdb
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\obj\Debug\TSTEmguCVDemo.Properties.Resources.resources
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\obj\Debug\TSTEmguCVDemo.csproj.GenerateResource.Cache
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\obj\Debug\TSTEmguCVDemo.exe
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\obj\Debug\TSTEmguCVDemo.pdb
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\obj\Debug\TSTEmguCVDemo.csprojResolveAssemblyReference.cache
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TST.Vision.Thirdparty.dll
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TST.Base.ToolsInterface.dll
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\Emgu.CV.World.dll
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TST.Vision.Thirdparty.pdb
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\TST.Base.ToolsInterface.pdb
+C:\local\TST\TSTEmguCVDemo\TSTEmguCVDemo\bin\Debug\Emgu.CV.World.xml

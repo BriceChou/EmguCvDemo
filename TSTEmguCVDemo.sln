@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSTEmguCVDemo", "TSTEmguCVDemo\TSTEmguCVDemo.csproj", "{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TST.Vision.Thirdparty", "TST.Vision.Thirdparty\TST.Vision.Thirdparty.csproj", "{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{560D3C70-0CE8-4EF0-9187-29C0928AAF6A}.Release|x86.ActiveCfg = Release|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{024BF2B3-F6AE-4E45-8C54-C364A30C8EC0}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
