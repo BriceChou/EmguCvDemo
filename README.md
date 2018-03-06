@@ -1,2 +1,2 @@
 # EmguCvDemo
- * It a demo for Engu Cv.
+ * It's a demo for Engu Cv.
