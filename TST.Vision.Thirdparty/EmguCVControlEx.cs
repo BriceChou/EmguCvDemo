@@ -41,7 +41,10 @@ namespace TST.Vision.Thirdparty
         List<Mat> m_cvObjectList = new List<Mat>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
         PictureBox picBox = new PictureBox();
-        private double m_CurrentZoomRate = 0;
+        Graphics graphics = null;
+        float startX = 0;
+        float startY = 0;
+        //private double m_CurrentZoomRate = 0;
         public EmguCVControlEx()
         {
             InitializeComponent();
@@ -56,6 +59,9 @@ namespace TST.Vision.Thirdparty
             this.picBox.TabIndex = 0;
             this.picBox.Location = this.Location;
             this.Controls.Add(this.picBox);
+
+            //graphics = this.CreateGraphics();
+            graphics = this.picBox.CreateGraphics();
         }
 
         public void DislpayObj(object obj)
@@ -81,7 +87,6 @@ namespace TST.Vision.Thirdparty
         {
             if (obj != null && obj is Mat)
             {
-                //Show(obj as Mat);
             }
         }
 
@@ -122,9 +127,41 @@ namespace TST.Vision.Thirdparty
             return null;
         }
 
+        private void ROIMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Console.WriteLine("ROIMouseDown X = " + e.X + "Y = " + e.Y);
+            this.startX = e.X;
+            this.startY = e.Y;
+        }
+
+        private void ROIMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Console.WriteLine("ROIMouseMove X = " + e.X + "Y = " + e.Y);
+        }
+
+        private void ROIMouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            Console.WriteLine("ROIMouseUp X = " + e.X + "Y = " + e.Y);
+            Point mouseDownLocation = new Point(e.X, e.Y);
+            float w = e.X - this.startX;
+            float h = e.Y - this.startY;
+            this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
+            this.startX = 0;
+            this.startY = 0;
+        }
+
         public object DrawRectangleROI()
         {
-            return null;
+            Console.WriteLine("DrawRectangleROI");
+            if (m_cvImage == null)
+            {
+                return null;
+            }
+            this.picBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ROIMouseDown);
+            this.picBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ROIMouseMove);
+            this.picBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ROIMouseUp);
+            SetWokingMode(ENUM_EmguCVControlEx_Mode.Display);
+            return new Rectangle(0, 0, 1, 1);
         }
 
         public object DrawRotateRectangleROI()

@@ -31,18 +31,29 @@
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Open = new System.Windows.Forms.Button();
+            this.button_Draw = new System.Windows.Forms.Button();
             this.cvControlEx1 = new TST.Vision.Thirdparty.EmguCVControlEx();
             this.SuspendLayout();
             // 
             // Open
             // 
-            this.Open.Location = new System.Drawing.Point(561, 74);
+            this.Open.Location = new System.Drawing.Point(571, 74);
             this.Open.Name = "Open";
             this.Open.Size = new System.Drawing.Size(143, 60);
             this.Open.TabIndex = 1;
             this.Open.Text = "Open File";
             this.Open.UseVisualStyleBackColor = true;
             this.Open.Click += new System.EventHandler(this.Open_Click);
+            // 
+            // button_Draw
+            // 
+            this.button_Draw.Location = new System.Drawing.Point(571, 180);
+            this.button_Draw.Name = "button_Draw";
+            this.button_Draw.Size = new System.Drawing.Size(143, 60);
+            this.button_Draw.TabIndex = 1;
+            this.button_Draw.Text = "Draw ROI";
+            this.button_Draw.UseVisualStyleBackColor = true;
+            this.button_Draw.Click += new System.EventHandler(this.button_Draw_Click);
             // 
             // EmguCVControlEx1
             // 
@@ -58,6 +69,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(927, 697);
             this.Controls.Add(this.Open);
+            this.Controls.Add(this.button_Draw);
             this.Controls.Add(this.cvControlEx1);
             this.Text = "Form1";
             this.Name = "Form1";
@@ -66,6 +78,7 @@
         #endregion
 
         private System.Windows.Forms.Button Open;
+        private System.Windows.Forms.Button button_Draw;
         private TST.Vision.Thirdparty.EmguCVControlEx cvControlEx1;
     }
 }

@@ -29,5 +29,11 @@ namespace TSTEmguCVDemo
                 this.cvControlEx1.DislpayObj(imageobj);
             }
         }
+
+        private void button_Draw_Click(object sender, EventArgs e)
+        {
+            object obj = this.cvControlEx1.DrawRectangleROI();
+            this.cvControlEx1.DislpayObj(obj);
+        }
     }
 }
