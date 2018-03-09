@@ -1,0 +1,8 @@
+TSTEmguCVDemo/obj/*
+TST.Vision.Thirdparty/obj/*
+TST.Vision.Thirdparty/bin/Debug/TST.Vision.Thirdparty.dll
+TST.Vision.Thirdparty/bin/Debug/TST.Vision.Thirdparty.pdb
+TSTEmguCVDemo/bin/Debug/TST.Vision.Thirdparty.dll
+TSTEmguCVDemo/bin/Debug/TST.Vision.Thirdparty.pdb
+TSTEmguCVDemo/bin/Debug/TSTEmguCVDemo.exe
+TSTEmguCVDemo/bin/Debug/TSTEmguCVDemo.pdb
