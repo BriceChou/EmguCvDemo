@@ -26,10 +26,16 @@
         /// 设计器支持所需的方法 - 不要
         /// 使用代码编辑器修改此方法的内容。
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent(int w, int h)
         {
-            components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.SuspendLayout();
+            // 
+            // EmguCVControlEx
+            // 
+            this.Name = "EmguCVControlEx";
+            this.Size = new System.Drawing.Size(w, h);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

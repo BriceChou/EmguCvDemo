@@ -32,7 +32,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Open = new System.Windows.Forms.Button();
             this.button_Draw = new System.Windows.Forms.Button();
-            this.cvControlEx1 = new TST.Vision.Thirdparty.EmguCVControlEx();
+            this.button_Zoom = new System.Windows.Forms.Button();
+            this.cvControlEx1 = new TST.Vision.Thirdparty.EmguCVControlEx(437, 477);
             this.SuspendLayout();
             // 
             // Open
@@ -50,17 +51,26 @@
             this.button_Draw.Location = new System.Drawing.Point(571, 180);
             this.button_Draw.Name = "button_Draw";
             this.button_Draw.Size = new System.Drawing.Size(143, 60);
-            this.button_Draw.TabIndex = 1;
+            this.button_Draw.TabIndex = 2;
             this.button_Draw.Text = "Draw ROI";
             this.button_Draw.UseVisualStyleBackColor = true;
             this.button_Draw.Click += new System.EventHandler(this.button_Draw_Click);
+            // 
+            // button_Zoom
+            // 
+            this.button_Zoom.Location = new System.Drawing.Point(571, 287);
+            this.button_Zoom.Name = "button_Zoom";
+            this.button_Zoom.Size = new System.Drawing.Size(143, 60);
+            this.button_Zoom.TabIndex = 3;
+            this.button_Zoom.Text = "ZOOM";
+            this.button_Zoom.UseVisualStyleBackColor = true;
+            this.button_Zoom.Click += new System.EventHandler(this.button_Zoom_Click);
             // 
             // EmguCVControlEx1
             // 
             this.cvControlEx1.BackColor = System.Drawing.Color.Black;
             this.cvControlEx1.Location = new System.Drawing.Point(41, 65);
             this.cvControlEx1.Name = "cvControlEx1";
-            this.cvControlEx1.Size = new System.Drawing.Size(437, 477);
             this.cvControlEx1.TabIndex = 0;
             // 
             // Form1
@@ -70,6 +80,7 @@
             this.ClientSize = new System.Drawing.Size(927, 697);
             this.Controls.Add(this.Open);
             this.Controls.Add(this.button_Draw);
+            this.Controls.Add(this.button_Zoom);
             this.Controls.Add(this.cvControlEx1);
             this.Text = "Form1";
             this.Name = "Form1";
@@ -79,6 +90,7 @@
 
         private System.Windows.Forms.Button Open;
         private System.Windows.Forms.Button button_Draw;
+        private System.Windows.Forms.Button button_Zoom;
         private TST.Vision.Thirdparty.EmguCVControlEx cvControlEx1;
     }
 }

@@ -35,5 +35,10 @@ namespace TSTEmguCVDemo
             object obj = this.cvControlEx1.DrawRectangleROI();
             this.cvControlEx1.DislpayObj(obj);
         }
+
+        private void button_Zoom_Click(object sender, EventArgs e)
+        {
+            this.cvControlEx1.SetZoomMode();
+        }
     }
 }
