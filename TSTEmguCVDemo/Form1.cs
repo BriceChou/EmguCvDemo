@@ -40,5 +40,15 @@ namespace TSTEmguCVDemo
         {
             this.cvControlEx1.SetZoomMode();
         }
+
+        private void button_Irregular_Click(object sender, EventArgs e)
+        {
+            this.cvControlEx1.DrawIrregularROI();
+        }
+
+        private void button_Contour_Click(object sender, EventArgs e)
+        {
+            this.cvControlEx1.DrawContour();
+        }
     }
 }

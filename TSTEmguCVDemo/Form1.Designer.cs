@@ -33,6 +33,8 @@
             this.Open = new System.Windows.Forms.Button();
             this.button_Draw = new System.Windows.Forms.Button();
             this.button_Zoom = new System.Windows.Forms.Button();
+            this.button_Irregular = new System.Windows.Forms.Button();
+            this.button_Contour = new System.Windows.Forms.Button();
             this.cvControlEx1 = new TST.Vision.Thirdparty.EmguCVControlEx(437, 477);
             this.SuspendLayout();
             // 
@@ -66,6 +68,26 @@
             this.button_Zoom.UseVisualStyleBackColor = true;
             this.button_Zoom.Click += new System.EventHandler(this.button_Zoom_Click);
             // 
+            // button_Draw_irregular ROI
+            // 
+            this.button_Irregular.Location = new System.Drawing.Point(571, 400);
+            this.button_Irregular.Name = "button_Irregular";
+            this.button_Irregular.Size = new System.Drawing.Size(143, 60);
+            this.button_Irregular.TabIndex = 3;
+            this.button_Irregular.Text = "Irregular ROI";
+            this.button_Irregular.UseVisualStyleBackColor = true;
+            this.button_Irregular.Click += new System.EventHandler(this.button_Irregular_Click);
+            // 
+            // button_Draw_contour
+            // 
+            this.button_Contour.Location = new System.Drawing.Point(750, 74);
+            this.button_Contour.Name = "button_Contour";
+            this.button_Contour.Size = new System.Drawing.Size(143, 60);
+            this.button_Contour.TabIndex = 3;
+            this.button_Contour.Text = "Draw Contour";
+            this.button_Contour.UseVisualStyleBackColor = true;
+            this.button_Contour.Click += new System.EventHandler(this.button_Contour_Click);
+            // 
             // EmguCVControlEx1
             // 
             this.cvControlEx1.BackColor = System.Drawing.Color.Black;
@@ -81,6 +103,8 @@
             this.Controls.Add(this.Open);
             this.Controls.Add(this.button_Draw);
             this.Controls.Add(this.button_Zoom);
+            this.Controls.Add(this.button_Irregular);
+            this.Controls.Add(this.button_Contour);
             this.Controls.Add(this.cvControlEx1);
             this.Text = "Form1";
             this.Name = "Form1";
@@ -91,6 +115,8 @@
         private System.Windows.Forms.Button Open;
         private System.Windows.Forms.Button button_Draw;
         private System.Windows.Forms.Button button_Zoom;
+        private System.Windows.Forms.Button button_Irregular;
+        private System.Windows.Forms.Button button_Contour;
         private TST.Vision.Thirdparty.EmguCVControlEx cvControlEx1;
     }
 }

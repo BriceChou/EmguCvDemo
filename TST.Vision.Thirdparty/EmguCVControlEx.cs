@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
+using Emgu.CV.Util;
 
 namespace TST.Vision.Thirdparty
 {
@@ -18,7 +19,8 @@ namespace TST.Vision.Thirdparty
         None,
         Display,
         ImageMove,
-        ImageZoom
+        ImageZoom,
+        IrregularROI
     }
 
     struct cvShowString
@@ -45,6 +47,8 @@ namespace TST.Vision.Thirdparty
         Graphics graphics = null;
         float startX = 0;
         float startY = 0;
+        List<Point> curvePoints = new List<Point>();
+        Boolean startDraw = false;
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
         private const double ZoomScale = 0.1;
         private double m_CurrentZoomRate = 0;
@@ -175,11 +179,6 @@ namespace TST.Vision.Thirdparty
         {
         }
 
-        public object DrawCircleROI()
-        {
-            return null;
-        }
-
         private void EmguCV_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (this.m_cvImage == null)
@@ -190,6 +189,13 @@ namespace TST.Vision.Thirdparty
                 case ENUM_EmguCVControlEx_Mode.Display:
                     this.startX = e.X;
                     this.startY = e.Y;
+                    break;
+                case ENUM_EmguCVControlEx_Mode.IrregularROI:
+                    this.startX = e.X;
+                    this.startY = e.Y;
+                    this.startDraw = true;
+                    Point p = new Point(e.X, e.Y);
+                    this.curvePoints.Add(p);
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
                     bool bZoomIn = (MouseButtons.Left == e.Button);
@@ -206,6 +212,18 @@ namespace TST.Vision.Thirdparty
 
         private void EmguCV_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+            switch (m_CurrentMode)
+            {
+                case ENUM_EmguCVControlEx_Mode.IrregularROI:
+                    if (this.startDraw)
+                    {
+                        Point p = new Point(e.X, e.Y);
+                        this.curvePoints.Add(p);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void EmguCV_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -221,6 +239,23 @@ namespace TST.Vision.Thirdparty
                     this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startX = 0;
                     this.startY = 0;
+                    break;
+                case ENUM_EmguCVControlEx_Mode.IrregularROI:
+                    this.startDraw = false;
+                    Point p = new Point(e.X, e.Y);
+                    this.curvePoints.Add(p);
+                    Pen redPen = new Pen(Color.Red, 1);
+                    graphics.DrawClosedCurve(redPen, curvePoints.ToArray());
+
+                    Mat roi = new Mat(m_cvImage.Size, DepthType.Cv8U, 3);
+                    Mat dst = new Mat();
+                    VectorOfVectorOfPoint contour = new VectorOfVectorOfPoint();
+                    VectorOfPoint pts = new VectorOfPoint();
+                    pts.Push(curvePoints.ToArray());
+                    contour.Push(pts);
+                    CvInvoke.DrawContours(roi, contour, 0, new MCvScalar(255, 255, 255), -1);
+                    m_cvImage.CopyTo(dst, roi);
+                    graphics.DrawImage(dst.ToImage<Bgr, Byte>().ToBitmap(), 0, 0, dst.Width, dst.Height);
                     break;
                 default:
                     break;
@@ -238,9 +273,44 @@ namespace TST.Vision.Thirdparty
             return new Rectangle(0, 0, 1, 1);
         }
 
+        public object DrawCircleROI()
+        {
+            return null;
+        }
+
         public object DrawRotateRectangleROI()
         {
             return null;
+        }
+
+        public void DrawIrregularROI()
+        {
+            Console.WriteLine("DrawIrregularROI");
+            if (m_cvImage == null)
+            {
+                return;
+            }
+            SetWokingMode(ENUM_EmguCVControlEx_Mode.IrregularROI);
+        }
+
+        public void DrawContour()
+        {
+            Console.WriteLine("DrawContour");
+            if (m_cvImage == null)
+            {
+                return;
+            }
+            SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
+            Image<Bgr, Byte> gray = new Image<Bgr, byte>(m_cvImage.Width, m_cvImage.Height);
+            CvInvoke.CvtColor(m_cvImage, gray, ColorConversion.Bgr2Gray);
+            CvInvoke.Threshold(gray, gray, 177, 255, 0);
+            VectorOfVectorOfPoint vvp = new VectorOfVectorOfPoint();
+            Mat hierarchy = new Mat();
+            CvInvoke.FindContours(gray, vvp, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxNone);
+            Image<Bgr, Byte> disp = new Image<Bgr, byte>(m_cvImage.Width, m_cvImage.Height);
+            Console.WriteLine("DrawContour vvp.length = " + vvp.Size);
+            CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
+            graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
 
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
