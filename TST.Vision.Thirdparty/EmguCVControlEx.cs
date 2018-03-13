@@ -63,7 +63,7 @@ namespace TST.Vision.Thirdparty
         {
             InitializeComponent(w, h);
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
-            graphics = this.cvImgBox.CreateGraphics();//this.CreateGraphics();
+            graphics = this.CreateGraphics();
             this.Controls.Add(cvImgBox);
         }
         #region Display the picture operation
@@ -127,9 +127,7 @@ namespace TST.Vision.Thirdparty
                     this.ImagePart.Y += (int)((this.Height - this.ImagePart.Height) / 2);
             }
 
-            this.cvImgBox.Image = img;
-            this.cvImgBox.Location = new Point(this.ImagePart.X, this.ImagePart.Y);
-            this.cvImgBox.Size = new Size(this.ImagePart.Width, this.ImagePart.Height);
+            graphics.DrawImage(img.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
         }
         #endregion
 
@@ -210,8 +208,7 @@ namespace TST.Vision.Thirdparty
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
                     int w = (int)(e.X - this.startX);
                     int h = (int)(e.Y - this.startY);
-                    //this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
-                    this.cvImgBox.DrawReversibleRectangle(new Rectangle((int)this.startX, (int)this.startY, w, h));
+                    this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startDraw = false;
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
@@ -229,10 +226,7 @@ namespace TST.Vision.Thirdparty
                     contour.Push(pts);
                     CvInvoke.DrawContours(roi, contour, 0, new MCvScalar(255, 255, 255), -1);
                     m_cvImage.CopyTo(dst, roi);
-                    //graphics.DrawImage(dst.ToImage<Bgr, Byte>().ToBitmap(), 0, 0, dst.Width, dst.Height);
-                    this.cvImgBox.Image = dst.ToImage<Bgr, Byte>();
-                    this.cvImgBox.Location = new Point(0, 0);
-                    this.cvImgBox.Size = new Size(dst.Width, dst.Height);
+                    graphics.DrawImage(dst.ToImage<Bgr, Byte>().ToBitmap(), 0, 0, dst.Width, dst.Height);
                     break;
                 default:
                     break;
@@ -294,10 +288,7 @@ namespace TST.Vision.Thirdparty
             CvInvoke.FindContours(gray, vvp, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxNone);
             Image<Bgr, Byte> disp = new Image<Bgr, byte>(m_cvImage.Width, m_cvImage.Height);
             CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
-            //graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
-            this.cvImgBox.Image = disp;
-            this.cvImgBox.Location = new Point(ImagePart.X, ImagePart.Y);
-            this.cvImgBox.Size = new Size(ImagePart.Width, ImagePart.Height);
+            graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
 
         #region Set working mode operation
@@ -311,12 +302,9 @@ namespace TST.Vision.Thirdparty
             this.cvImgBox.HorizontalScrollBar.Enabled = false;
             this.cvImgBox.VerticalScrollBar.Enabled = false;
             this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            //this.MouseDown -= this.EmguCV_MouseDown;
-            //this.MouseMove -= this.EmguCV_MouseMove;
-            //this.MouseUp -= this.EmguCV_MouseUp;
-            this.cvImgBox.MouseUp -= this.EmguCV_MouseUp;
-            this.cvImgBox.MouseMove -= this.EmguCV_MouseMove;
-            this.cvImgBox.MouseDown -= this.EmguCV_MouseDown;
+            this.MouseDown -= this.EmguCV_MouseDown;
+            this.MouseMove -= this.EmguCV_MouseMove;
+            this.MouseUp -= this.EmguCV_MouseUp;
             m_CurrentMode = changeMode;
             switch (changeMode)
             {
@@ -334,12 +322,9 @@ namespace TST.Vision.Thirdparty
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
-                    this.cvImgBox.MouseUp += this.EmguCV_MouseUp;
-                    this.cvImgBox.MouseMove += this.EmguCV_MouseMove;
-                    this.cvImgBox.MouseDown += this.EmguCV_MouseDown;
-                    //this.MouseDown += this.EmguCV_MouseDown;
-                    //this.MouseMove += this.EmguCV_MouseMove;
-                    //this.MouseUp += this.EmguCV_MouseUp;
+                    this.MouseDown += this.EmguCV_MouseDown;
+                    this.MouseMove += this.EmguCV_MouseMove;
+                    this.MouseUp += this.EmguCV_MouseUp;
                     break;
                 default:
                     break;

@@ -59,7 +59,7 @@ namespace TSTEmguCVDemo
         private void button_Display_Click(object sender, EventArgs e)
         {
             this.cvControlEx1.SetDisPlayMode();
-            this.cvControlEx1.ShowMessage(12,22,"Hello!!",Color.Yellow);
+            this.cvControlEx1.ShowMessage(12, 22, "offset: x = 1.000, y = 1.000",Color.Red);
         }
     }
 }
