@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Emgu.CV;
+using Emgu.CV.UI;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Util;
@@ -44,22 +45,27 @@ namespace TST.Vision.Thirdparty
         Image<Bgr, Byte> image = null;
         List<Mat> m_cvObjectList = new List<Mat>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
+
         Graphics graphics = null;
         float startX = 0;
         float startY = 0;
         List<Point> curvePoints = new List<Point>();
         Boolean startDraw = false;
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
+
         private const double ZoomScale = 0.1;
         private double m_CurrentZoomRate = 0;
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
+        ImageBox cvImgBox = new ImageBox();
+
         public EmguCVControlEx(int w, int h)
         {
             InitializeComponent(w, h);
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
             graphics = this.CreateGraphics();
+            this.Controls.Add(cvImgBox);
         }
-
+        #region Display the picture operation
         public void DislpayObj(object obj)
         {
             if (obj == null)
@@ -120,70 +126,31 @@ namespace TST.Vision.Thirdparty
                     this.ImagePart.Y += (int)((this.Height - this.ImagePart.Height) / 2);
             }
 
-            graphics.DrawImage(img.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
+            this.cvImgBox.Image = img;
+            this.cvImgBox.Location = new Point(this.ImagePart.X, this.ImagePart.Y);
+            this.cvImgBox.Size = new Size(this.ImagePart.Width, this.ImagePart.Height);
         }
+        #endregion
 
         public void ShowMessage(int x, int y, string message, System.Drawing.Color color)
         {
+            Point position = new Point(x, y);
+            Font font = new Font("黑体", 16, GraphicsUnit.Pixel);
+            SolidBrush fontLine = new SolidBrush(color);
+            graphics.DrawString(message, font, fontLine, position);
         }
 
         private void ZoomImage(double x, double y, bool bZoomIn)
         {
-            Rectangle CurrentRectangle = ImagePart;
-            m_CurrentZoomRate = 1 / m_CurrentZoomRate;
-            double TempZoomScale = ZoomScale, TempZoomRate = m_CurrentZoomRate;
-            double lefterCornerXoffset = (x - CurrentRectangle.X) / (CurrentRectangle.Width * 1.0) * (this.Width * 1.0) * TempZoomScale;
-            double lefterCornerYoffset = (y - CurrentRectangle.Y) / (CurrentRectangle.Height * 1.0) * (this.Height * 1.0) * TempZoomScale;
-            if (bZoomIn)
-            {
-                // Zoom in
-                TempZoomRate = m_CurrentZoomRate - ZoomScale;
-                if (TempZoomRate < 1)
-                {
-                    TempZoomScale = m_CurrentZoomRate - 1;
-                    m_CurrentZoomRate = 1;
-                    lefterCornerXoffset = (x - CurrentRectangle.X) / (CurrentRectangle.Width * 1.0) * (this.Width * 1.0) * TempZoomScale;
-                    lefterCornerYoffset = (y - CurrentRectangle.Y) / (CurrentRectangle.Height * 1.0) * (this.Height * 1.0) * TempZoomScale;
-                }
-                else
-                {
-                    m_CurrentZoomRate = TempZoomRate;
-                }
 
-                CurrentRectangle.X += (int)Math.Round(lefterCornerXoffset);
-                CurrentRectangle.Y += (int)Math.Round(lefterCornerYoffset);
-            }
-            else
-            {
-                // Zoom out
-                m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
-                CurrentRectangle.X -= (int)Math.Round(lefterCornerXoffset);
-                CurrentRectangle.Y -= (int)Math.Round(lefterCornerYoffset);
-
-                /*
-                m_CurrentZoomRate -= ZoomScale;
-                this.ImagePart.Width = (int)(image.Size.Width * m_CurrentZoomRate);
-                this.ImagePart.Height = (int)(image.Size.Height * m_CurrentZoomRate);
-                this.ImagePart.X += (int)(x * ZoomScale / TempZoomRate);
-                this.ImagePart.Y += (int)(y * ZoomScale / TempZoomRate);
-                 * */
-            }
-            CurrentRectangle.Width = (int)Math.Round(this.Width * m_CurrentZoomRate);
-            CurrentRectangle.Height = (int)Math.Round(this.Height * m_CurrentZoomRate);
-            ImagePart = CurrentRectangle;
-            graphics.Clear(Color.Black);
-            graphics.DrawImage(image.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
         }
 
-        private void MoveImage(double xDelta, double yDelta)
-        {
-        }
-
+        #region Move picture operation
         private void EmguCV_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             if (this.m_cvImage == null)
                 return;
-            
+
             switch (m_CurrentMode)
             {
                 case ENUM_EmguCVControlEx_Mode.Display:
@@ -262,6 +229,17 @@ namespace TST.Vision.Thirdparty
             }
         }
 
+        private void MoveImage(double xDelta, double yDelta)
+        {
+        }
+        #endregion
+
+        #region Draw ROI operation
+        public object DrawCircleROI()
+        {
+            return null;
+        }
+
         public object DrawRectangleROI()
         {
             Console.WriteLine("DrawRectangleROI");
@@ -273,15 +251,11 @@ namespace TST.Vision.Thirdparty
             return new Rectangle(0, 0, 1, 1);
         }
 
-        public object DrawCircleROI()
-        {
-            return null;
-        }
-
         public object DrawRotateRectangleROI()
         {
             return null;
         }
+        #endregion
 
         public void DrawIrregularROI()
         {
@@ -313,20 +287,33 @@ namespace TST.Vision.Thirdparty
             graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
 
+        #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
         {
-            m_CurrentMode = changeMode;
-            if (m_CurrentMode == ENUM_EmguCVControlEx_Mode.None)
+            //Minimum	0	The ImageBox is only used for displaying image. No right-click menu nor Pan/Zoom available
+            //RightClickMenu	1	Enable the right click menu
+            //PanAndZoom	2	Enable Pan and Zoom
+            //Everything	3	Support for the right click menu, Pan and Zoom
+
+            this.cvImgBox.HorizontalScrollBar.Enabled = false;
+            this.cvImgBox.VerticalScrollBar.Enabled = false;
+            this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+            switch (changeMode)
             {
-                this.MouseDown -= this.EmguCV_MouseDown;
-                this.MouseMove -= this.EmguCV_MouseMove;
-                this.MouseUp -= this.EmguCV_MouseUp;
-            }
-            else
-            {
-                this.MouseDown += this.EmguCV_MouseDown;
-                this.MouseMove += this.EmguCV_MouseMove;
-                this.MouseUp += this.EmguCV_MouseUp;
+                case ENUM_EmguCVControlEx_Mode.None:
+                    break;
+                case ENUM_EmguCVControlEx_Mode.Display:
+                    break;
+                case ENUM_EmguCVControlEx_Mode.ImageZoom:
+                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
+                    break;
+                case ENUM_EmguCVControlEx_Mode.ImageMove:
+                    this.cvImgBox.HorizontalScrollBar.Enabled = true;
+                    this.cvImgBox.VerticalScrollBar.Enabled = true;
+                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -344,5 +331,8 @@ namespace TST.Vision.Thirdparty
         {
             SetWokingMode(ENUM_EmguCVControlEx_Mode.ImageMove);
         }
+        #endregion
     }
 }
+
+
