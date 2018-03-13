@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Open = new System.Windows.Forms.Button();
             this.button_Draw = new System.Windows.Forms.Button();
             this.button_Zoom = new System.Windows.Forms.Button();
+            this.button_Move = new System.Windows.Forms.Button();
+            this.button_Display = new System.Windows.Forms.Button();
             this.cvControlEx1 = new TST.Vision.Thirdparty.EmguCVControlEx(437, 477);
             this.SuspendLayout();
             // 
@@ -66,24 +66,48 @@
             this.button_Zoom.UseVisualStyleBackColor = true;
             this.button_Zoom.Click += new System.EventHandler(this.button_Zoom_Click);
             // 
-            // EmguCVControlEx1
+            // button_Move
+            // 
+            this.button_Move.Location = new System.Drawing.Point(762, 74);
+            this.button_Move.Name = "button_Move";
+            this.button_Move.Size = new System.Drawing.Size(129, 60);
+            this.button_Move.TabIndex = 4;
+            this.button_Move.Text = "Move";
+            this.button_Move.UseVisualStyleBackColor = true;
+            this.button_Move.Click += new System.EventHandler(this.button_Move_Click);
+            // 
+            // cvControlEx1
             // 
             this.cvControlEx1.BackColor = System.Drawing.Color.Black;
             this.cvControlEx1.Location = new System.Drawing.Point(41, 65);
             this.cvControlEx1.Name = "cvControlEx1";
             this.cvControlEx1.TabIndex = 0;
             // 
+            // button_Display
+            // 
+            this.button_Display.Location = new System.Drawing.Point(762, 180);
+            this.button_Display.Name = "button_Display";
+            this.button_Display.Size = new System.Drawing.Size(129, 60);
+            this.button_Display.TabIndex = 5;
+            this.button_Display.Text = "Display";
+            this.button_Display.UseVisualStyleBackColor = true;
+            this.button_Display.Click += new System.EventHandler(this.button_Display_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(927, 697);
+            this.Controls.Add(this.button_Display);
+            this.Controls.Add(this.button_Move);
             this.Controls.Add(this.Open);
             this.Controls.Add(this.button_Draw);
             this.Controls.Add(this.button_Zoom);
             this.Controls.Add(this.cvControlEx1);
-            this.Text = "Form1";
             this.Name = "Form1";
+            this.Text = "Form1";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
@@ -92,6 +116,8 @@
         private System.Windows.Forms.Button button_Draw;
         private System.Windows.Forms.Button button_Zoom;
         private TST.Vision.Thirdparty.EmguCVControlEx cvControlEx1;
+        private System.Windows.Forms.Button button_Move;
+        private System.Windows.Forms.Button button_Display;
     }
 }
 

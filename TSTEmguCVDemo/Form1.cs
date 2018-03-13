@@ -40,5 +40,16 @@ namespace TSTEmguCVDemo
         {
             this.cvControlEx1.SetZoomMode();
         }
+
+        private void button_Move_Click(object sender, EventArgs e)
+        {
+            this.cvControlEx1.SetMoveMode();
+        }
+
+        private void button_Display_Click(object sender, EventArgs e)
+        {
+            this.cvControlEx1.SetDisPlayMode();
+            this.cvControlEx1.ShowMessage(12,22,"Hello!!",Color.Yellow);
+        }
     }
 }
