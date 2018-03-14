@@ -61,6 +61,8 @@ namespace TST.Vision.Thirdparty
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
         ImageBox cvImgBox = new ImageBox();
 
+        private bool m_bCanMove = false;
+
         public EmguCVControlEx(int w, int h)
         {
             InitializeComponent(w, h);
@@ -198,19 +200,15 @@ namespace TST.Vision.Thirdparty
             Console.WriteLine("EmguCV_MouseDown");
             if (this.m_cvImage == null)
                 return;
-            this.startX = 0;
-            this.startY = 0;
+            this.startX = e.X;
+            this.startY = e.Y;
 
             switch (m_CurrentMode)
             {
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
-                    this.startX = e.X;
-                    this.startY = e.Y;
                     this.startDraw = true;
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
-                    this.startX = e.X;
-                    this.startY = e.Y;
                     this.startDraw = true;
                     Point p = new Point(e.X, e.Y);
                     this.curvePoints.Add(p);
@@ -220,8 +218,7 @@ namespace TST.Vision.Thirdparty
                     ZoomImage(e.X, e.Y, bZoomIn);
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
-                    //m_bCanMove = (MouseButtons.Left == e.Button);
-                    //m_StartPoint = new PointF((float)e.X, (float)e.Y);
+                    m_bCanMove = (MouseButtons.Left == e.Button);
                     break;
                 default:
                     break;
@@ -238,6 +235,12 @@ namespace TST.Vision.Thirdparty
                     {
                         Point p = new Point(e.X, e.Y);
                         this.curvePoints.Add(p);
+                    }
+                    break;
+                case ENUM_EmguCVControlEx_Mode.ImageMove:
+                    if (m_bCanMove)
+                    {
+                        MoveImage(e.X - startX, e.Y - startY);
                     }
                     break;
                 default:
@@ -276,6 +279,14 @@ namespace TST.Vision.Thirdparty
                     m_cvImage.CopyTo(dst, roi);
                     graphics.DrawImage(dst.ToImage<Bgr, Byte>().ToBitmap(), 0, 0, dst.Width, dst.Height);
                     break;
+                case ENUM_EmguCVControlEx_Mode.ImageMove:
+                    if (m_bCanMove)
+                    {
+                        ImagePart.X += (int)(e.X - startX);
+                        ImagePart.Y += (int)(e.Y - startY);
+                        m_bCanMove = false;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -283,6 +294,8 @@ namespace TST.Vision.Thirdparty
 
         private void MoveImage(double xDelta, double yDelta)
         {
+            graphics.Clear(Color.Black);
+            graphics.DrawImage(bitmap, (float)(ImagePart.X + xDelta), (float)(ImagePart.Y + yDelta), ImagePart.Width, ImagePart.Height);
         }
         #endregion
 
@@ -362,12 +375,13 @@ namespace TST.Vision.Thirdparty
                 //case ENUM_EmguCVControlEx_Mode.ImageZoom:
                 //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
                 //    break;
-                case ENUM_EmguCVControlEx_Mode.ImageMove:
-                    this.cvImgBox.HorizontalScrollBar.Enabled = true;
-                    this.cvImgBox.VerticalScrollBar.Enabled = true;
-                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-                    break;
+                //case ENUM_EmguCVControlEx_Mode.ImageMove:
+                //    this.cvImgBox.HorizontalScrollBar.Enabled = true;
+                //    this.cvImgBox.VerticalScrollBar.Enabled = true;
+                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
+                //    break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
+                case ENUM_EmguCVControlEx_Mode.ImageMove:
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
                     this.MouseDown += this.EmguCV_MouseDown;
