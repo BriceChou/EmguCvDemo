@@ -44,6 +44,8 @@ namespace TST.Vision.Thirdparty
     {
         Mat m_cvImage = null;
         Image<Bgr, Byte> image = null;
+        Bitmap bitmap = null;
+
         List<Mat> m_cvObjectList = new List<Mat>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
 
@@ -101,33 +103,39 @@ namespace TST.Vision.Thirdparty
             }
             Image<Bgr, Byte> img = TempCvImage.ToImage<Bgr, Byte>();
             this.image = img;
-            this.ImagePart.Width = 0;
-            this.ImagePart.Height = 0;
-            this.ImagePart.X = 0;
-            this.ImagePart.Y = 0;
+            this.bitmap = img.ToBitmap();
+            Rectangle disRect = new Rectangle();
+
             if (img.Size.Width < this.Width && img.Size.Height < this.Height)
             {
                 // If img small then display screen, not scale just display in center
-                this.ImagePart.Width = img.Size.Width;
-                this.ImagePart.Height = img.Size.Height;
-                this.ImagePart.X += (int)((this.Width - this.ImagePart.Width) / 2);
-                this.ImagePart.Y += (int)((this.Height - this.ImagePart.Height) / 2);
+                disRect.Width = img.Size.Width;
+                disRect.Height = img.Size.Height;
+                disRect.X += (int)((this.Width - disRect.Width) / 2);
+                disRect.Y += (int)((this.Height - disRect.Height) / 2);
                 m_CurrentZoomRate = 1.0;
             }
             else
             {
-                double TempZoomW = (this.Width * 1.0) / img.Size.Width;
-                double TempZoomH = (this.Height * 1.0) / img.Size.Height;
-                m_CurrentZoomRate = Math.Min(TempZoomH, TempZoomW);
-                this.ImagePart.Width = (int)Math.Round(m_CurrentZoomRate * img.Size.Width);
-                this.ImagePart.Height = (int)Math.Round(m_CurrentZoomRate * img.Size.Height);
-                if (this.ImagePart.Width < this.Width)
-                    this.ImagePart.X += (int)((this.Width - this.ImagePart.Width) / 2);
-                if (this.ImagePart.Height < this.Height)
-                    this.ImagePart.Y += (int)((this.Height - this.ImagePart.Height) / 2);
+                double ZoomW = (this.Width * 1.0) / img.Size.Width;
+                double ZoomH = (this.Height * 1.0) / img.Size.Height;
+                double m_ZoomRate = Math.Min(ZoomW, ZoomH);
+                disRect.Width = (int)Math.Round(m_ZoomRate * img.Size.Width);
+                disRect.Height = (int)Math.Round(m_ZoomRate * img.Size.Height);
+                if (disRect.Width < this.Width)
+                    disRect.X += (int)((this.Width - disRect.Width) / 2);
+                if (disRect.Height < this.Height)
+                    disRect.Y += (int)((this.Height - disRect.Height) / 2);
             }
 
-            graphics.DrawImage(img.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
+            double TempZoomW = m_cvImage.Width / (this.Width * 1.0);
+            double TempZoomH = m_cvImage.Height / (this.Height * 1.0);
+            m_CurrentZoomRate = Math.Max(TempZoomW, TempZoomH);
+            m_CurrentZoomRate = Math.Max(m_CurrentZoomRate, 1.0);//显示象素小于窗体宽度时有异常
+            this.ImagePart = disRect;
+
+            graphics.Clear(Color.Black);
+            graphics.DrawImage(this.bitmap, disRect.X, disRect.Y, disRect.Width, disRect.Height);
         }
         #endregion
 
@@ -141,7 +149,47 @@ namespace TST.Vision.Thirdparty
 
         private void ZoomImage(double x, double y, bool bZoomIn)
         {
+            Rectangle CurrentRectangle = ImagePart;
+            double TempZoomRate = m_CurrentZoomRate;
+            if (bZoomIn)
+            {
+                TempZoomRate = m_CurrentZoomRate - ZoomScale;
+                if (TempZoomRate < 1)
+                {
+                    m_CurrentZoomRate = 1;
+                }
+                else
+                {
+                    m_CurrentZoomRate = TempZoomRate;
+                }
 
+                //double offsetX = this.image.Width / m_CurrentZoomRate - CurrentRectangle.Width;
+                //double offsetY = this.image.Height / m_CurrentZoomRate - CurrentRectangle.Height;
+                //CurrentRectangle.X -= (int)(((x - CurrentRectangle.X) / CurrentRectangle.Width) * offsetX);
+                //CurrentRectangle.Y -= (int)(((y - CurrentRectangle.Y) / CurrentRectangle.Height) * offsetY);
+                double ratioX = this.image.Width / m_CurrentZoomRate / CurrentRectangle.Width;
+                double ratioY = this.image.Height / m_CurrentZoomRate / CurrentRectangle.Height;
+                CurrentRectangle.X = (int)(x - (x - CurrentRectangle.X) * ratioX);
+                CurrentRectangle.Y = (int)(y - (y - CurrentRectangle.Y) * ratioY);
+            }
+            else
+            {
+                m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
+                //double offsetX = -(this.image.Width / m_CurrentZoomRate - CurrentRectangle.Width);
+                //double offsetY = -(this.image.Height / m_CurrentZoomRate - CurrentRectangle.Height);
+                //CurrentRectangle.X += (int)(((x - CurrentRectangle.X) / CurrentRectangle.Width) * offsetX);
+                //CurrentRectangle.Y += (int)(((y - CurrentRectangle.Y) / CurrentRectangle.Height) * offsetY);
+                double ratioX = this.image.Width / m_CurrentZoomRate / CurrentRectangle.Width;
+                double ratioY = this.image.Height / m_CurrentZoomRate / CurrentRectangle.Height;
+                CurrentRectangle.X = (int)(x - (x - CurrentRectangle.X) * ratioX);
+                CurrentRectangle.Y = (int)(y - (y - CurrentRectangle.Y) * ratioY);
+            }
+            CurrentRectangle.Width = (int)(this.image.Width / m_CurrentZoomRate);
+            CurrentRectangle.Height = (int)(this.image.Height / m_CurrentZoomRate);
+            ImagePart = CurrentRectangle;
+            graphics.Clear(Color.Black);
+            graphics.DrawImage(this.bitmap, this.ImagePart.X, this.ImagePart.Y,
+                this.ImagePart.Width, this.ImagePart.Height);
         }
 
         #region Move picture operation
@@ -168,8 +216,8 @@ namespace TST.Vision.Thirdparty
                     this.curvePoints.Add(p);
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
-                    //bool bZoomIn = (MouseButtons.Left == e.Button);
-                    //ZoomImage(e.X, e.Y, bZoomIn);
+                    bool bZoomIn = (MouseButtons.Left == e.Button);
+                    ZoomImage(e.X, e.Y, bZoomIn);
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
                     //m_bCanMove = (MouseButtons.Left == e.Button);
@@ -251,7 +299,6 @@ namespace TST.Vision.Thirdparty
             {
                 return null;
             }
-            //SetDisPlayMode();
             SetWokingMode(ENUM_EmguCVControlEx_Mode.RectangleROI);
             return new Rectangle(0, 0, 1, 1);
         }
@@ -312,14 +359,15 @@ namespace TST.Vision.Thirdparty
                     break;
                 case ENUM_EmguCVControlEx_Mode.Display:
                     break;
-                case ENUM_EmguCVControlEx_Mode.ImageZoom:
-                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
-                    break;
+                //case ENUM_EmguCVControlEx_Mode.ImageZoom:
+                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
+                //    break;
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
                     this.cvImgBox.HorizontalScrollBar.Enabled = true;
                     this.cvImgBox.VerticalScrollBar.Enabled = true;
                     this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
                     break;
+                case ENUM_EmguCVControlEx_Mode.ImageZoom:
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
                     this.MouseDown += this.EmguCV_MouseDown;
