@@ -45,21 +45,22 @@ namespace TST.Vision.Thirdparty
         Mat m_cvImage = null;
         Image<Bgr, Byte> image = null;
         List<Mat> m_cvObjectList = new List<Mat>();
+        List<Point> curvePoints = new List<Point>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
 
         Graphics graphics = null;
         float startX = 0;
         float startY = 0;
 
-        List<Point> curvePoints = new List<Point>();
         Boolean startDraw = false;
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
 
         private const double ZoomScale = 0.1;
-        private double m_CurrentZoomRate = 0;
+        private double m_CurrentZoomRate = 1.0;
 
-        int center_x_point = 0;
-        int center_y_point = 0;
+        int _centerPointY = 0;
+        int _centerPointX = 0;
+        Point _mouseClientPoint = new Point();
 
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
         ImageBox cvImgBox = new ImageBox();
@@ -70,28 +71,27 @@ namespace TST.Vision.Thirdparty
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
             graphics = this.CreateGraphics();
 
-            // Set the coordinate center position
-            center_x_point = this.Width / 2;
-            center_y_point = this.Height / 2;
-
+            _centerPointX = this.Width / 2;
+            _centerPointY = this.Height / 2;
             this.Controls.Add(cvImgBox);
         }
 
         #region Draw coordinate feature
-        private void DrawCoordinate()
+        private void DrawCoordinate(int startX, int startY, int width, int height)
         {
-            Point x_start = new Point(0, center_y_point);
-            Point x_end = new Point(this.Width, center_y_point);
+            Console.WriteLine(startX);
+            Console.WriteLine(startY);
 
-            Point y_start = new Point(center_x_point, 0);
-            Point y_end = new Point(center_x_point, this.Height);
+            Point xAxisStart = new Point(0, startY);
+            Point xAxisEnd = new Point(width, startY);
+
+            Point yAxisStart = new Point(startX, 0);
+            Point yAxisEnd = new Point(startX, height);
 
             Pen myPen = new Pen(Color.Red, 3);
 
-            graphics.DrawLine(myPen, x_start, x_end);
-            graphics.DrawLine(myPen, y_start, y_end);
-
-            graphics.FillEllipse(Brushes.Red, center_x_point, center_y_point, 8, 8);
+            graphics.DrawLine(myPen, xAxisStart, xAxisEnd);
+            graphics.DrawLine(myPen, yAxisStart, yAxisEnd);
         }
         #endregion
 
@@ -160,7 +160,10 @@ namespace TST.Vision.Thirdparty
             }
 
             graphics.DrawImage(img.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
-            DrawCoordinate();
+            //DrawCoordinate(this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
+            DrawCoordinate(_centerPointX, _centerPointY, this.Width, this.Height);
+            //Reset current rate to 1
+            m_CurrentZoomRate = 1.0;
         }
         #endregion
 
@@ -172,10 +175,85 @@ namespace TST.Vision.Thirdparty
             graphics.DrawString(message, font, fontLine, position);
         }
 
+        #region Zoom mode operation
+        private void EmguCV_Zoom_MouseDown(object sender, MouseEventArgs e)
+        {
+            _mouseClientPoint = this.PointToClient(Control.MousePosition);
+
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+
+                    m_CurrentZoomRate += ZoomScale;
+                    Console.WriteLine("Left");
+                    Console.WriteLine(_mouseClientPoint);
+                    ZoomImage(_mouseClientPoint.X, _mouseClientPoint.Y, true);
+                    break;
+                case MouseButtons.Right:
+                    Console.WriteLine("Right");
+                    if (m_CurrentMode > 0)
+                    {
+                        m_CurrentZoomRate -= ZoomScale;
+                    }
+                    else
+                    {
+                        m_CurrentZoomRate = 0.1;
+                    }
+                    Console.WriteLine(_mouseClientPoint);
+                    ZoomImage(_mouseClientPoint.X, _mouseClientPoint.Y, false);
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void ZoomImage(double x, double y, bool bZoomIn)
         {
+            int xAdd = 0;
+            int yAdd = 0;
 
+            if (bZoomIn)
+            {
+                //Handle the small image
+                if (this.ImagePart.Width < this.Width && this.ImagePart.Height < this.Height)
+                {
+                    this.ImagePart.Width = (int)(this.ImagePart.Width * m_CurrentZoomRate);
+                    this.ImagePart.Height = (int)(this.ImagePart.Height * m_CurrentZoomRate);
+                }
+                else
+                {
+                    this.ImagePart.Width = (int)(this.ImagePart.Width * m_CurrentZoomRate);
+                    this.ImagePart.Height = (int)(this.ImagePart.Height * m_CurrentZoomRate);
+                    xAdd = (int)(x * (m_CurrentZoomRate - 1.0));
+                    yAdd = (int)(y * (m_CurrentZoomRate - 1.0));
+                    this.ImagePart.X = this.ImagePart.X - xAdd;
+                    this.ImagePart.Y = this.ImagePart.Y - yAdd;
+                }
+            }
+            else
+            {
+                if (m_CurrentZoomRate < 1.0)
+                {
+                    this.ImagePart.Width = (int)(this.ImagePart.Width / m_CurrentZoomRate);
+                    this.ImagePart.Height = (int)(this.ImagePart.Height / m_CurrentZoomRate);
+                    xAdd = (int)(x * (1.0 - 1.0 / m_CurrentZoomRate));
+                    yAdd = (int)(y * (1.0 - 1.0 / m_CurrentZoomRate));
+                    this.ImagePart.X = this.ImagePart.X + xAdd;
+                    this.ImagePart.Y = this.ImagePart.Y + yAdd;
+                }
+                this.ImagePart.Width = (int)(this.ImagePart.Width / m_CurrentZoomRate);
+                this.ImagePart.Height = (int)(this.ImagePart.Height / m_CurrentZoomRate);
+                xAdd = (int)(x * (1.0 - 1.0 / m_CurrentZoomRate));
+                yAdd = (int)(y * (1.0 - 1.0 / m_CurrentZoomRate));
+                this.ImagePart.X = this.ImagePart.X + xAdd;
+                this.ImagePart.Y = this.ImagePart.Y + yAdd;
+            }
+            Console.WriteLine("m_CurrentZoomRate" + m_CurrentZoomRate);
+            Console.WriteLine("Width" + this.ImagePart.Width);
+            Console.WriteLine("Height" + this.ImagePart.Height);
+            graphics.DrawImage(this.image.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
         }
+        #endregion
 
         #region Move picture operation
         private void EmguCV_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -293,7 +371,6 @@ namespace TST.Vision.Thirdparty
         {
             return null;
         }
-        #endregion
 
         public void DrawIrregularROI()
         {
@@ -323,21 +400,16 @@ namespace TST.Vision.Thirdparty
             CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
             graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
+        #endregion
 
         #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
         {
-            //Minimum	0	The ImageBox is only used for displaying image. No right-click menu nor Pan/Zoom available
-            //RightClickMenu	1	Enable the right click menu
-            //PanAndZoom	2	Enable Pan and Zoom
-            //Everything	3	Support for the right click menu, Pan and Zoom
-
-            this.cvImgBox.HorizontalScrollBar.Enabled = false;
-            this.cvImgBox.VerticalScrollBar.Enabled = false;
-            this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-            this.MouseDown -= this.EmguCV_MouseDown;
-            this.MouseMove -= this.EmguCV_MouseMove;
             this.MouseUp -= this.EmguCV_MouseUp;
+            this.MouseMove -= this.EmguCV_MouseMove;
+            this.MouseDown -= this.EmguCV_MouseDown;
+            this.MouseDown -= this.EmguCV_Zoom_MouseDown;
+
             m_CurrentMode = changeMode;
             switch (changeMode)
             {
@@ -346,12 +418,9 @@ namespace TST.Vision.Thirdparty
                 case ENUM_EmguCVControlEx_Mode.Display:
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
-                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
+                    this.MouseDown += this.EmguCV_Zoom_MouseDown;
                     break;
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
-                    this.cvImgBox.HorizontalScrollBar.Enabled = true;
-                    this.cvImgBox.VerticalScrollBar.Enabled = true;
-                    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
@@ -381,5 +450,3 @@ namespace TST.Vision.Thirdparty
         #endregion
     }
 }
-
-
