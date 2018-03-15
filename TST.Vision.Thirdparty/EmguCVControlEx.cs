@@ -189,9 +189,15 @@ namespace TST.Vision.Thirdparty
             CurrentRectangle.Width = (int)(this.image.Width / m_CurrentZoomRate);
             CurrentRectangle.Height = (int)(this.image.Height / m_CurrentZoomRate);
             ImagePart = CurrentRectangle;
-            graphics.Clear(Color.Black);
-            graphics.DrawImage(this.bitmap, this.ImagePart.X, this.ImagePart.Y,
-                this.ImagePart.Width, this.ImagePart.Height);
+
+            BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
+            BufferedGraphics myBuffer = currentContext.Allocate(graphics, new Rectangle(0, 0, this.Width, this.Height));
+            Graphics g = myBuffer.Graphics;
+            g.Clear(Color.Black);
+            g.DrawImage(bitmap, ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
+            myBuffer.Render(graphics);
+            myBuffer.Dispose();
+            g.Dispose();
         }
 
         #region Move picture operation
@@ -294,8 +300,14 @@ namespace TST.Vision.Thirdparty
 
         private void MoveImage(double xDelta, double yDelta)
         {
-            graphics.Clear(Color.Black);
-            graphics.DrawImage(bitmap, (float)(ImagePart.X + xDelta), (float)(ImagePart.Y + yDelta), ImagePart.Width, ImagePart.Height);
+            BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
+            BufferedGraphics myBuffer = currentContext.Allocate(graphics, new Rectangle(0, 0, this.Width, this.Height));
+            Graphics g = myBuffer.Graphics;
+            g.Clear(Color.Black);
+            g.DrawImage(bitmap, (float)(ImagePart.X + xDelta), (float)(ImagePart.Y + yDelta), ImagePart.Width, ImagePart.Height);
+            myBuffer.Render(graphics);
+            myBuffer.Dispose();
+            g.Dispose();
         }
         #endregion
 
