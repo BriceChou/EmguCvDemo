@@ -50,12 +50,17 @@ namespace TST.Vision.Thirdparty
         Graphics graphics = null;
         float startX = 0;
         float startY = 0;
+
         List<Point> curvePoints = new List<Point>();
         Boolean startDraw = false;
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
 
         private const double ZoomScale = 0.1;
         private double m_CurrentZoomRate = 0;
+
+        int center_x_point = 0;
+        int center_y_point = 0;
+
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
         ImageBox cvImgBox = new ImageBox();
 
@@ -64,8 +69,32 @@ namespace TST.Vision.Thirdparty
             InitializeComponent(w, h);
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
             graphics = this.CreateGraphics();
+
+            // Set the coordinate center position
+            center_x_point = this.Width / 2;
+            center_y_point = this.Height / 2;
+
             this.Controls.Add(cvImgBox);
         }
+
+        #region Draw coordinate feature
+        private void DrawCoordinate()
+        {
+            Point x_start = new Point(0, center_y_point);
+            Point x_end = new Point(this.Width, center_y_point);
+
+            Point y_start = new Point(center_x_point, 0);
+            Point y_end = new Point(center_x_point, this.Height);
+
+            Pen myPen = new Pen(Color.Red, 3);
+
+            graphics.DrawLine(myPen, x_start, x_end);
+            graphics.DrawLine(myPen, y_start, y_end);
+
+            graphics.FillEllipse(Brushes.Red, center_x_point, center_y_point, 8, 8);
+        }
+        #endregion
+
         #region Display the picture operation
         public void DislpayObj(object obj)
         {
@@ -99,12 +128,15 @@ namespace TST.Vision.Thirdparty
             {
                 return;
             }
+
             Image<Bgr, Byte> img = TempCvImage.ToImage<Bgr, Byte>();
             this.image = img;
+
             this.ImagePart.Width = 0;
             this.ImagePart.Height = 0;
             this.ImagePart.X = 0;
             this.ImagePart.Y = 0;
+
             if (img.Size.Width < this.Width && img.Size.Height < this.Height)
             {
                 // If img small then display screen, not scale just display in center
@@ -128,6 +160,7 @@ namespace TST.Vision.Thirdparty
             }
 
             graphics.DrawImage(img.ToBitmap(), this.ImagePart.X, this.ImagePart.Y, this.ImagePart.Width, this.ImagePart.Height);
+            DrawCoordinate();
         }
         #endregion
 

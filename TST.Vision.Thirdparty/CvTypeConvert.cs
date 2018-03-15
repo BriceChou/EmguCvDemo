@@ -9,10 +9,11 @@ namespace TST.Vision.Thirdparty
 {
     public class CvTypeConvert
     {
-        public static object GetImag(string file)
+        public static object GetImag(string filename)
         {
-            Mat image = CvInvoke.Imread(file);
+            Mat image = CvInvoke.Imread(filename, Emgu.CV.CvEnum.ImreadModes.AnyColor);
             return image;
         }
     }
 }
+
