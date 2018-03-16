@@ -46,7 +46,7 @@ namespace TST.Vision.Thirdparty
         Image<Bgr, Byte> image = null;
         Bitmap bitmap = null;
 
-        List<Mat> m_cvObjectList = new List<Mat>();
+        List<Rectangle> m_cvObjectList = new List<Rectangle>();
         List<cvShowString> m_showstingList = new List<cvShowString>();
 
         Graphics graphics = null;
@@ -59,7 +59,6 @@ namespace TST.Vision.Thirdparty
         private const double ZoomScale = 0.1;
         private double m_CurrentZoomRate = 0;
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
-        ImageBox cvImgBox = new ImageBox();
 
         private bool m_bCanMove = false;
 
@@ -68,14 +67,13 @@ namespace TST.Vision.Thirdparty
             InitializeComponent(w, h);
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
             graphics = this.CreateGraphics();
-            this.Controls.Add(cvImgBox);
         }
         #region Display the picture operation
         public void DislpayObj(object obj)
         {
             if (obj == null)
                 return;
-            if (obj.GetType().Equals(typeof(Mat)))
+            if (obj is Mat)
             {
                 m_cvObjectList.Clear();
                 m_showstingList.Clear();
@@ -84,16 +82,17 @@ namespace TST.Vision.Thirdparty
             }
             else
             {
-                Mat cvObj = obj as Mat;
+                Rectangle cvObj = (Rectangle)obj;
                 m_cvObjectList.Add(cvObj);
                 DisPlayObject(cvObj);
             }
         }
 
-        private void DisPlayObject(object obj)
+        private void DisPlayObject(Rectangle obj)
         {
-            if (obj != null && obj is Mat)
+            if (obj != null)
             {
+                CvInvoke.cvSetImageROI(m_cvImage, obj);
             }
         }
 
@@ -203,7 +202,6 @@ namespace TST.Vision.Thirdparty
         #region Move picture operation
         private void EmguCV_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Console.WriteLine("EmguCV_MouseDown");
             if (this.m_cvImage == null)
                 return;
             this.startX = e.X;
@@ -233,7 +231,6 @@ namespace TST.Vision.Thirdparty
 
         private void EmguCV_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Console.WriteLine("EmguCV_MouseMove");
             switch (m_CurrentMode)
             {
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
@@ -256,7 +253,6 @@ namespace TST.Vision.Thirdparty
 
         private void EmguCV_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Console.WriteLine("EmguCV_MouseUp");
             if (this.m_cvImage == null)
                 return;
 
@@ -267,6 +263,7 @@ namespace TST.Vision.Thirdparty
                     int h = (int)(e.Y - this.startY);
                     this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startDraw = false;
+                    this.DislpayObj(new Rectangle((int)startX, (int)startY, w, h));
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                     this.startDraw = false;
@@ -319,19 +316,19 @@ namespace TST.Vision.Thirdparty
 
         public object DrawRectangleROI()
         {
-            Console.WriteLine("DrawRectangleROI");
             if (m_cvImage == null)
             {
                 return null;
             }
             SetWokingMode(ENUM_EmguCVControlEx_Mode.RectangleROI);
-            return new Rectangle(0, 0, 1, 1);
+            return m_cvImage;
         }
 
         public object DrawRotateRectangleROI()
         {
             return null;
         }
+
         #endregion
 
         public void DrawIrregularROI()
@@ -366,14 +363,6 @@ namespace TST.Vision.Thirdparty
         #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
         {
-            //Minimum	0	The ImageBox is only used for displaying image. No right-click menu nor Pan/Zoom available
-            //RightClickMenu	1	Enable the right click menu
-            //PanAndZoom	2	Enable Pan and Zoom
-            //Everything	3	Support for the right click menu, Pan and Zoom
-
-            this.cvImgBox.HorizontalScrollBar.Enabled = false;
-            this.cvImgBox.VerticalScrollBar.Enabled = false;
-            this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
             this.MouseDown -= this.EmguCV_MouseDown;
             this.MouseMove -= this.EmguCV_MouseMove;
             this.MouseUp -= this.EmguCV_MouseUp;
@@ -384,14 +373,6 @@ namespace TST.Vision.Thirdparty
                     break;
                 case ENUM_EmguCVControlEx_Mode.Display:
                     break;
-                //case ENUM_EmguCVControlEx_Mode.ImageZoom:
-                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
-                //    break;
-                //case ENUM_EmguCVControlEx_Mode.ImageMove:
-                //    this.cvImgBox.HorizontalScrollBar.Enabled = true;
-                //    this.cvImgBox.VerticalScrollBar.Enabled = true;
-                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-                //    break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
