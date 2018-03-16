@@ -345,7 +345,6 @@ namespace TST.Vision.Thirdparty
             CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
             graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
-        #endregion
 
         #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
