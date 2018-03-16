@@ -137,6 +137,7 @@ namespace TST.Vision.Thirdparty
             this.ImagePart = disRect;
 
             graphics.Clear(Color.Black);
+            Console.WriteLine("disRect X: " + disRect.X + "disRect Y: " + disRect.Y);
             graphics.DrawImage(this.bitmap, disRect.X, disRect.Y, disRect.Width, disRect.Height);
         }
         #endregion
@@ -155,39 +156,25 @@ namespace TST.Vision.Thirdparty
             double TempZoomRate = m_CurrentZoomRate;
             if (bZoomIn)
             {
-                TempZoomRate = m_CurrentZoomRate - ZoomScale;
-                if (TempZoomRate < 1)
-                {
-                    m_CurrentZoomRate = 1;
-                }
-                else
-                {
-                    m_CurrentZoomRate = TempZoomRate;
-                }
-
-                //double offsetX = this.image.Width / m_CurrentZoomRate - CurrentRectangle.Width;
-                //double offsetY = this.image.Height / m_CurrentZoomRate - CurrentRectangle.Height;
-                //CurrentRectangle.X -= (int)(((x - CurrentRectangle.X) / CurrentRectangle.Width) * offsetX);
-                //CurrentRectangle.Y -= (int)(((y - CurrentRectangle.Y) / CurrentRectangle.Height) * offsetY);
-                double ratioX = this.image.Width / m_CurrentZoomRate / CurrentRectangle.Width;
-                double ratioY = this.image.Height / m_CurrentZoomRate / CurrentRectangle.Height;
-                CurrentRectangle.X = (int)(x - (x - CurrentRectangle.X) * ratioX);
-                CurrentRectangle.Y = (int)(y - (y - CurrentRectangle.Y) * ratioY);
+                m_CurrentZoomRate = 1.0 + ZoomScale;
+                double ratioX = (x - this.ImagePart.X) * ZoomScale;
+                double ratioY = (y - this.ImagePart.Y) * ZoomScale;
+                CurrentRectangle.X = (int)(this.ImagePart.X - ratioX);
+                CurrentRectangle.Y = (int)(this.ImagePart.Y - ratioY);
+                CurrentRectangle.Width = (int)(this.ImagePart.Width * m_CurrentZoomRate);
+                CurrentRectangle.Height = (int)(this.ImagePart.Height * m_CurrentZoomRate);
             }
             else
             {
                 m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
-                //double offsetX = -(this.image.Width / m_CurrentZoomRate - CurrentRectangle.Width);
-                //double offsetY = -(this.image.Height / m_CurrentZoomRate - CurrentRectangle.Height);
-                //CurrentRectangle.X += (int)(((x - CurrentRectangle.X) / CurrentRectangle.Width) * offsetX);
-                //CurrentRectangle.Y += (int)(((y - CurrentRectangle.Y) / CurrentRectangle.Height) * offsetY);
                 double ratioX = this.image.Width / m_CurrentZoomRate / CurrentRectangle.Width;
                 double ratioY = this.image.Height / m_CurrentZoomRate / CurrentRectangle.Height;
                 CurrentRectangle.X = (int)(x - (x - CurrentRectangle.X) * ratioX);
                 CurrentRectangle.Y = (int)(y - (y - CurrentRectangle.Y) * ratioY);
+                CurrentRectangle.Width = (int)(this.image.Width / m_CurrentZoomRate);
+                CurrentRectangle.Height = (int)(this.image.Height / m_CurrentZoomRate);
             }
-            CurrentRectangle.Width = (int)(this.image.Width / m_CurrentZoomRate);
-            CurrentRectangle.Height = (int)(this.image.Height / m_CurrentZoomRate);
+
             ImagePart = CurrentRectangle;
 
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
@@ -332,7 +319,6 @@ namespace TST.Vision.Thirdparty
         {
             return null;
         }
-        #endregion
 
         public void DrawIrregularROI()
         {
@@ -362,15 +348,11 @@ namespace TST.Vision.Thirdparty
             CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
             graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
+        #endregion
 
         #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
         {
-            //Minimum	0	The ImageBox is only used for displaying image. No right-click menu nor Pan/Zoom available
-            //RightClickMenu	1	Enable the right click menu
-            //PanAndZoom	2	Enable Pan and Zoom
-            //Everything	3	Support for the right click menu, Pan and Zoom
-
             this.cvImgBox.HorizontalScrollBar.Enabled = false;
             this.cvImgBox.VerticalScrollBar.Enabled = false;
             this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
@@ -384,15 +366,9 @@ namespace TST.Vision.Thirdparty
                     break;
                 case ENUM_EmguCVControlEx_Mode.Display:
                     break;
-                //case ENUM_EmguCVControlEx_Mode.ImageZoom:
-                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.PanAndZoom;
-                //    break;
-                //case ENUM_EmguCVControlEx_Mode.ImageMove:
-                //    this.cvImgBox.HorizontalScrollBar.Enabled = true;
-                //    this.cvImgBox.VerticalScrollBar.Enabled = true;
-                //    this.cvImgBox.FunctionalMode = ImageBox.FunctionalModeOption.Minimum;
-                //    break;
                 case ENUM_EmguCVControlEx_Mode.ImageZoom:
+                    this.MouseDown += this.EmguCV_MouseDown;
+                    break;
                 case ENUM_EmguCVControlEx_Mode.ImageMove:
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                 case ENUM_EmguCVControlEx_Mode.RectangleROI:
@@ -422,5 +398,3 @@ namespace TST.Vision.Thirdparty
         #endregion
     }
 }
-
-
