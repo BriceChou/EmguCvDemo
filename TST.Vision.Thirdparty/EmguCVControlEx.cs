@@ -57,7 +57,6 @@ namespace TST.Vision.Thirdparty
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
 
         private const double ZoomScale = 0.1;
-        private double m_CurrentZoomRate = 0;
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
 
         private bool m_bCanMove = false;
@@ -114,7 +113,6 @@ namespace TST.Vision.Thirdparty
                 disRect.Height = img.Size.Height;
                 disRect.X += (int)((this.Width - disRect.Width) / 2);
                 disRect.Y += (int)((this.Height - disRect.Height) / 2);
-                m_CurrentZoomRate = 1.0;
             }
             else
             {
@@ -129,10 +127,6 @@ namespace TST.Vision.Thirdparty
                     disRect.Y += (int)((this.Height - disRect.Height) / 2);
             }
 
-            double TempZoomW = m_cvImage.Width / (this.Width * 1.0);
-            double TempZoomH = m_cvImage.Height / (this.Height * 1.0);
-            m_CurrentZoomRate = Math.Max(TempZoomW, TempZoomH);
-            m_CurrentZoomRate = Math.Max(m_CurrentZoomRate, 1.0);//显示象素小于窗体宽度时有异常
             this.ImagePart = disRect;
 
             graphics.Clear(Color.Black);
@@ -150,30 +144,30 @@ namespace TST.Vision.Thirdparty
 
         private void ZoomImage(double x, double y, bool bZoomIn)
         {
-            Rectangle CurrentRectangle = ImagePart;
-            double TempZoomRate = m_CurrentZoomRate;
+            Rectangle currentRectangle = ImagePart;
+
+            double widthScale =  (x - this.ImagePart.X) * ZoomScale;
+            double heightScale =  (y - this.ImagePart.Y) * ZoomScale;
+
             if (bZoomIn)
             {
-                m_CurrentZoomRate = 1.0 + ZoomScale;
-                double ratioX = (x - this.ImagePart.X) * ZoomScale;
-                double ratioY = (y - this.ImagePart.Y) * ZoomScale;
-                CurrentRectangle.X = (int)(this.ImagePart.X - ratioX);
-                CurrentRectangle.Y = (int)(this.ImagePart.Y - ratioY);
-                CurrentRectangle.Width = (int)(this.ImagePart.Width * m_CurrentZoomRate);
-                CurrentRectangle.Height = (int)(this.ImagePart.Height * m_CurrentZoomRate);
+                currentRectangle.X = (int)(this.ImagePart.X - widthScale);
+                currentRectangle.Y = (int)(this.ImagePart.Y - heightScale);
+                currentRectangle.Width = (int)(this.ImagePart.Width  * (1.0 + ZoomScale));
+                currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 + ZoomScale));
             }
             else
             {
-                m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
-                double ratioX = this.image.Width / m_CurrentZoomRate / CurrentRectangle.Width;
-                double ratioY = this.image.Height / m_CurrentZoomRate / CurrentRectangle.Height;
-                CurrentRectangle.X = (int)(x - (x - CurrentRectangle.X) * ratioX);
-                CurrentRectangle.Y = (int)(y - (y - CurrentRectangle.Y) * ratioY);
-                CurrentRectangle.Width = (int)(this.image.Width / m_CurrentZoomRate);
-                CurrentRectangle.Height = (int)(this.image.Height / m_CurrentZoomRate);
+                if (this.ImagePart.Width > this.image.Width * ZoomScale || this.ImagePart.Height > this.image.Height)
+                {
+                    currentRectangle.X = (int)(this.ImagePart.X + widthScale);
+                    currentRectangle.Y = (int)(this.ImagePart.Y + heightScale);
+                    currentRectangle.Width = (int)(this.ImagePart.Width * (1.0 - ZoomScale));
+                    currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 - ZoomScale));
+                }
             }
 
-            ImagePart = CurrentRectangle;
+            ImagePart = currentRectangle;
 
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
             BufferedGraphics myBuffer = currentContext.Allocate(graphics, new Rectangle(0, 0, this.Width, this.Height));
@@ -345,7 +339,6 @@ namespace TST.Vision.Thirdparty
             CvInvoke.DrawContours(disp, vvp, -1, new MCvScalar(255, 255, 255), 1);
             graphics.DrawImage(disp.ToBitmap(), ImagePart.X, ImagePart.Y, ImagePart.Width, ImagePart.Height);
         }
-        #endregion
 
         #region Set working mode operation
         public void SetWokingMode(ENUM_EmguCVControlEx_Mode changeMode)
