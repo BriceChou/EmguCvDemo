@@ -32,7 +32,13 @@ namespace TSTEmguCVDemo
 
         private void button_Draw_Click(object sender, EventArgs e)
         {
-            this.cvControlEx1.DrawRectangleROI();
+            Action<Rectangle> getRectangle = ShowRectangleROI;
+            this.cvControlEx1.DrawRectangleROI(getRectangle);
+        }
+
+        private static void ShowRectangleROI(Rectangle rect)
+        {
+            Console.WriteLine(rect.ToString());
         }
 
         private void button_Zoom_Click(object sender, EventArgs e)

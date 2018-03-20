@@ -60,6 +60,7 @@ namespace TST.Vision.Thirdparty
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
 
         private bool m_bCanMove = false;
+        Action<Rectangle> backRectangle;
 
         public EmguCVControlEx(int w, int h)
         {
@@ -91,7 +92,7 @@ namespace TST.Vision.Thirdparty
         {
             if (obj != null)
             {
-                CvInvoke.cvSetImageROI(m_cvImage, obj);
+                //CvInvoke.cvSetImageROI(m_cvImage, obj);
             }
         }
 
@@ -243,7 +244,8 @@ namespace TST.Vision.Thirdparty
                     int h = (int)(e.Y - this.startY);
                     this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startDraw = false;
-                    this.DislpayObj(new Rectangle((int)startX, (int)startY, w, h));
+                    backRectangle(new Rectangle((int)startX, (int)startY, w, h));
+                    //this.DislpayObj(new Rectangle((int)startX, (int)startY, w, h));
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                     this.startDraw = false;
@@ -296,12 +298,17 @@ namespace TST.Vision.Thirdparty
 
         public object DrawRectangleROI()
         {
+            return null;
+        }
+
+        public void DrawRectangleROI(Action<Rectangle> callback)
+        {
             if (m_cvImage == null)
             {
-                return null;
+                return;
             }
             SetWokingMode(ENUM_EmguCVControlEx_Mode.RectangleROI);
-            return m_cvImage;
+            backRectangle = callback;
         }
 
         public object DrawRotateRectangleROI()
