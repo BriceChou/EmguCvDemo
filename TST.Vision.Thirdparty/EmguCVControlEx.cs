@@ -61,6 +61,7 @@ namespace TST.Vision.Thirdparty
 
         private bool m_bCanMove = false;
         Action<Rectangle> backRectangle;
+        double m_ZoomRate = 0;
 
         public EmguCVControlEx(int w, int h)
         {
@@ -92,7 +93,6 @@ namespace TST.Vision.Thirdparty
         {
             if (obj != null)
             {
-                //CvInvoke.cvSetImageROI(m_cvImage, obj);
             }
         }
 
@@ -119,7 +119,7 @@ namespace TST.Vision.Thirdparty
             {
                 double ZoomW = (this.Width * 1.0) / img.Size.Width;
                 double ZoomH = (this.Height * 1.0) / img.Size.Height;
-                double m_ZoomRate = Math.Min(ZoomW, ZoomH);
+                m_ZoomRate = Math.Min(ZoomW, ZoomH);
                 disRect.Width = (int)Math.Round(m_ZoomRate * img.Size.Width);
                 disRect.Height = (int)Math.Round(m_ZoomRate * img.Size.Height);
                 if (disRect.Width < this.Width)
@@ -244,8 +244,9 @@ namespace TST.Vision.Thirdparty
                     int h = (int)(e.Y - this.startY);
                     this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startDraw = false;
-                    backRectangle(new Rectangle((int)startX, (int)startY, w, h));
-                    //this.DislpayObj(new Rectangle((int)startX, (int)startY, w, h));
+                    Rectangle position = new Rectangle((int)(startX / m_ZoomRate), (int)(startY / m_ZoomRate), (int)(w / m_ZoomRate), (int)(h / m_ZoomRate));
+                    backRectangle(position);
+                    this.DislpayObj(position);
                     break;
                 case ENUM_EmguCVControlEx_Mode.IrregularROI:
                     this.startDraw = false;
