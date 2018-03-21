@@ -57,6 +57,7 @@ namespace TST.Vision.Thirdparty
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
 
         private const double ZoomScale = 0.1;
+        private double m_CurrentZoomRate = 1.0;
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
 
         private bool m_bCanMove = false;
@@ -156,6 +157,7 @@ namespace TST.Vision.Thirdparty
                 currentRectangle.Y = (int)(this.ImagePart.Y - heightScale);
                 currentRectangle.Width = (int)(this.ImagePart.Width  * (1.0 + ZoomScale));
                 currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 + ZoomScale));
+                m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
             }
             else
             {
@@ -165,6 +167,7 @@ namespace TST.Vision.Thirdparty
                     currentRectangle.Y = (int)(this.ImagePart.Y + heightScale);
                     currentRectangle.Width = (int)(this.ImagePart.Width * (1.0 - ZoomScale));
                     currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 - ZoomScale));
+                    m_CurrentZoomRate = m_CurrentZoomRate - ZoomScale;
                 }
             }
 
