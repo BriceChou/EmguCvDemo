@@ -67,7 +67,10 @@ namespace TST.Vision.Thirdparty
         {
             InitializeComponent(w, h);
             SetWokingMode(ENUM_EmguCVControlEx_Mode.None);
-            graphics = this.CreateGraphics();
+            if (graphics == null)
+            {
+                graphics = this.CreateGraphics();
+            }
         }
         #region Display the picture operation
         public void DislpayObj(object obj)
@@ -102,6 +105,19 @@ namespace TST.Vision.Thirdparty
             {
                 return;
             }
+
+            if (this.image != null)
+            {
+                this.image.Dispose();
+                this.image = null;
+            }
+
+            if (this.bitmap != null)
+            {
+                this.bitmap.Dispose();
+                this.bitmap = null;
+            }
+
             Image<Bgr, Byte> img = TempCvImage.ToImage<Bgr, Byte>();
             this.image = img;
             this.bitmap = img.ToBitmap();
