@@ -57,12 +57,11 @@ namespace TST.Vision.Thirdparty
         private ENUM_EmguCVControlEx_Mode m_CurrentMode = ENUM_EmguCVControlEx_Mode.None;
 
         private const double ZoomScale = 0.1;
-        private double m_CurrentZoomRate = 1.0;
         Rectangle ImagePart = new Rectangle(0, 0, 0, 0);
 
         private bool m_bCanMove = false;
         Action<Rectangle> backRectangle;
-        double m_ZoomRate = 0;
+        private double m_ZoomRate = 0;
 
         public EmguCVControlEx(int w, int h)
         {
@@ -157,7 +156,6 @@ namespace TST.Vision.Thirdparty
                 currentRectangle.Y = (int)(this.ImagePart.Y - heightScale);
                 currentRectangle.Width = (int)(this.ImagePart.Width  * (1.0 + ZoomScale));
                 currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 + ZoomScale));
-                m_CurrentZoomRate = m_CurrentZoomRate + ZoomScale;
             }
             else
             {
@@ -167,11 +165,11 @@ namespace TST.Vision.Thirdparty
                     currentRectangle.Y = (int)(this.ImagePart.Y + heightScale);
                     currentRectangle.Width = (int)(this.ImagePart.Width * (1.0 - ZoomScale));
                     currentRectangle.Height = (int)(this.ImagePart.Height * (1.0 - ZoomScale));
-                    m_CurrentZoomRate = m_CurrentZoomRate - ZoomScale;
                 }
             }
 
             ImagePart = currentRectangle;
+            m_ZoomRate = (double)this.ImagePart.Width / this.image.Width;
 
             BufferedGraphicsContext currentContext = BufferedGraphicsManager.Current;
             BufferedGraphics myBuffer = currentContext.Allocate(graphics, new Rectangle(0, 0, this.Width, this.Height));
@@ -247,7 +245,7 @@ namespace TST.Vision.Thirdparty
                     int h = (int)(e.Y - this.startY);
                     this.graphics.DrawRectangle(new Pen(new SolidBrush(Color.Red)), this.startX, this.startY, w, h);
                     this.startDraw = false;
-                    Rectangle position = new Rectangle((int)(startX / m_ZoomRate), (int)(startY / m_ZoomRate), (int)(w / m_ZoomRate), (int)(h / m_ZoomRate));
+                    Rectangle position = new Rectangle((int)((startX - ImagePart.X) / m_ZoomRate), (int)((startY - ImagePart.Y) / m_ZoomRate), (int)(w / m_ZoomRate), (int)(h / m_ZoomRate));
                     backRectangle(position);
                     this.DislpayObj(position);
                     break;
